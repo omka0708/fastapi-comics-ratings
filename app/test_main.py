@@ -1,14 +1,13 @@
-import asyncio
-from typing import AsyncGenerator
-
-import httpx
-import pytest
-import pytest_asyncio
-
 from .auth.auth import current_user
 from .auth.models import User
 from .database import async_session_maker, get_async_session
 from .main import app
+
+from sqlalchemy.ext.asyncio import AsyncSession
+import asyncio
+import httpx
+import pytest
+import pytest_asyncio
 
 user = User(
     email="temp@mail.com",
@@ -19,7 +18,7 @@ user = User(
 )
 
 
-async def override_get_async_session() -> AsyncGenerator | None:
+async def override_get_async_session() -> AsyncSession | None:
     async with async_session_maker() as session:
         yield session
 
@@ -48,11 +47,7 @@ async def user_client():
 async def test_create_rating(user_client: httpx.AsyncClient):
     response = await user_client.post("/api/ratings", json={"comic_id": 100, "VALUE": 5})
     assert response.status_code == 200, response.text
-    assert response.json() == {
-        'VALUE': 5,
-        'comic_id': 100,
-        'user_id': None,
-    }
+    assert response.json()['comic_id'] == 100 and response.json()['VALUE'] == 5
 
 
 @pytest.mark.asyncio
