@@ -31,6 +31,8 @@ Run this command at the working directory */fastapi-comics-ratings*:
 
 Then you should import the database dump `data.sql`, which stores everything for testing the application.
 
+All users in database have password "string".
+
     cat data.sql | docker exec -i comics-db psql -U <database user> "dbname=<database name>"
 
 > Don't use Git Bash on windows for this command, use PowerShell.
